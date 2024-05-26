@@ -1,0 +1,97 @@
+import sqlite3
+from prettytable import PrettyTable, from_db_cursor
+
+table = PrettyTable()
+
+def adding():
+    nama = input("Masukan nama mahasiswa: ")
+    nim = int(input("Masukan nim mahasiswa: "))
+    kelas = input("Masukan kelas mahasiswa: ")
+
+    db = sqlite3.connect("data.db")
+    cursor = db.cursor()
+    cursor.execute(f"SELECT nim FROM list WHERE nim = {nim}")
+    result = cursor.fetchone()
+
+    
+    if result is None:
+        sql = ("INSERT INTO list(nama, nim, kelas) VALUES (?, ?, ?)")
+        val = (nama, nim, kelas)
+        cursor.execute(sql, val)
+        print("Data mahasiswa berhasil di tambahkan!") 
+        db.commit()
+    else:
+        print("NIM YANG ANDA MASUKAN SUDAH TERDAFTAR!")
+
+    db.close()  
+
+def showing():
+    db = sqlite3.connect("data.db")
+    cursor = db.cursor()
+    cursor.execute(f"SELECT nama, nim, kelas FROM list")
+    mydata = from_db_cursor(cursor)
+    print(mydata)
+
+    db.close()
+
+def updating():
+    def change_name():
+        nim_validation = int(input("Silahkan masukan nim anda: "))
+        db = sqlite3.connect("data.db")
+        cursor = db.cursor()
+        cursor.execute(f"SELECT nama FROM list WHERE nim = {nim_validation}")
+        cursor.fetchone()
+
+        new_nama = input("Masukan nama yang baru: ")
+
+        sql = ("UPDATE list SET nama = ? WHERE nim = ?")
+        val = (new_nama), nim_validation
+        cursor.execute(sql, val)
+        print("NAMA ANDA SUDAH DI GANTI!")
+
+        db.commit()
+        db.close()
+
+    def change_kelas():
+        nim_validation = int(input("Silahkan masukan nim anda: "))
+        db = sqlite3.connect("data.db")
+        cursor = db.cursor()
+        cursor.execute(f"SELECT nama FROM list WHERE nim = {nim_validation}")
+        cursor.fetchone()
+
+        new_kelas = input("Masukan kelas yang baru: ")
+
+        sql = ("UPDATE list SET kelas = ? WHERE nim = ?")
+        val = (new_kelas), nim_validation
+        cursor.execute(sql, val)
+        print("KELAS ANDA SUDAH DI GANTI!")
+
+        db.commit()
+        db.close()
+
+    print("Masukan nomor yang ingin anda pilih:\n1. ganti nama\n2. ganti kelas")
+    change = input('Silahkan pilih menu: ')
+
+    if change == "1":
+        change_name()
+    elif change == "2":
+        change_kelas()
+        
+def main():
+    while True:
+        print("==| SILAHKAN PILIH MENU |==")
+        print("1. tambah data\n2. lihat data\n3. ganti nama/kelas")
+
+        menu = input("Masukan pilihan anda: ")
+
+        if menu == "1":
+            adding()
+        elif menu == "2":
+            showing()
+        elif menu == "3":
+            updating()
+        else:
+            break    
+
+if __name__ == "__main__":
+    main()
